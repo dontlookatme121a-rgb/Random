@@ -15794,10 +15794,12 @@ Main = (function()
 end)()
 
 -- Start
-task.wait(10)
-if not DeleteRemoteQC then
-	CanLoad = false
-	warn("[Dex++, QuirkyCMD Edit]: Unable to get QuirkyCMD Remote, make sure the game is supported.")
+if not DeleteRemoteQC then	
+	task.wait(10)
+	if not DeleteRemoteQC then
+		CanLoad = false
+		warn("[Dex++, QuirkyCMD Edit]: Unable to get QuirkyCMD Remote, make sure the game is supported.")
+	end
 end
 
 if not CanLoad then
