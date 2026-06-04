@@ -1926,25 +1926,35 @@ local EmbeddedModules = {
 					selection:Clear()
 				end})
 
-				context:Register("DELETE_CHILDREN",{Name = "Delete Children", IconMap = Explorer.MiscIcons, Icon = "Delete", DisabledIcon = "Delete_Disabled", Shortcut = "Shift+Del", OnClick = function()
-					local sList = selection.List
-					for i = 1,#sList do
-						if DeleteRemoteQC then
-							pcall(function(v)
-								if v then
-									for omo,child in pairs(v:GetChildren()) do
-										if child then
-											DeleteRemoteQC:FireServer(v)
+				context:Register("DELETE_CHILDREN", {
+					Name = "Delete Children",
+					IconMap = Explorer.MiscIcons,
+					Icon = "Delete",
+					DisabledIcon = "Delete_Disabled",
+					Shortcut = "Shift+Del",
+					OnClick = function()
+						local sList = selection.List
+						for i = 1, #sList do
+							local obj = sList[i].Obj
+							if not obj then continue end
+
+							if DeleteRemoteQC then
+								pcall(function()
+									for _, child in ipairs(obj:GetDescendants()) do
+										if child and child.Parent then
+											DeleteRemoteQC:FireServer(child)
 										end
+										task.wait(math.random(1,10)*.01)
 									end
-								end
-							end,sList[i].Obj)
-						else	
-							pcall(sList[i].Obj.ClearAllChildren,sList[i].Obj)
+								end)
+							else
+								pcall(obj.ClearAllChildren, obj)
+							end
 						end
+
+						selection:Clear()
 					end
-					selection:Clear()
-				end})
+				})
 				context:Register("RENAME",{Name = "Rename", IconMap = Explorer.MiscIcons, Icon = "Rename", DisabledIcon = "Rename_Disabled", Shortcut = "F2", OnClick = function()
 					local sList = selection.List
 					if sList[1] then
