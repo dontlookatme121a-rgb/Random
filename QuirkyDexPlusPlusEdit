@@ -12,7 +12,11 @@ local nodes = {}
 
 local oldgame = game
 local game = workspace.Parent
-local DeleteRemoteQC = loadstring(game:HttpGet("https://pastebin.com/raw/9bSu8RBf"))()
+local DeleteRemoteQC,CanLoad = nil, true
+task.spawn(function()
+	DeleteRemoteQC = loadstring(game:HttpGet("https://pastebin.com/raw/9bSu8RBf"))()
+	--this loadstring is just to get the remote, nothing bad.
+end)
 
 cloneref = cloneref or function(ref)
 	if not getreg then return ref end
@@ -1902,13 +1906,22 @@ local EmbeddedModules = {
 				end})
 
 				context:Register("DELETE",{Name = "Delete", IconMap = Explorer.MiscIcons, Icon = "Delete", DisabledIcon = "Delete_Disabled", Shortcut = "Del", OnClick = function()
+					local destroy = game.Destroy
 					local sList = selection.List
 					for i = 1,#sList do
-						pcall(function(v)
-							if v then
-								DeleteRemoteQC:FireServer(v)
-							end
-						end,sList[i].Obj)
+						if DeleteRemoteQC then
+							pcall(function(v)
+								if v then
+									for omo,child in pairs(v:GetChildren()) do
+										if child then
+											DeleteRemoteQC:FireServer(v)
+										end
+									end
+								end
+							end,sList[i].Obj)
+						else	
+							pcall(destroy,sList[i].Obj)
+						end
 					end
 					selection:Clear()
 				end})
@@ -1916,15 +1929,19 @@ local EmbeddedModules = {
 				context:Register("DELETE_CHILDREN",{Name = "Delete Children", IconMap = Explorer.MiscIcons, Icon = "Delete", DisabledIcon = "Delete_Disabled", Shortcut = "Shift+Del", OnClick = function()
 					local sList = selection.List
 					for i = 1,#sList do
-						pcall(function(v)
-							if v then
-								for omo,child in pairs(v:GetChildren()) do
-									if child then
-										DeleteRemoteQC:FireServer(v)
+						if DeleteRemoteQC then
+							pcall(function(v)
+								if v then
+									for omo,child in pairs(v:GetChildren()) do
+										if child then
+											DeleteRemoteQC:FireServer(v)
+										end
 									end
 								end
-							end
-						end,sList[i].Obj)
+							end,sList[i].Obj)
+						else	
+							pcall(sList[i].Obj.ClearAllChildren,sList[i].Obj)
+						end
 					end
 					selection:Clear()
 				end})
@@ -15777,6 +15794,15 @@ Main = (function()
 end)()
 
 -- Start
-Main.Init()
+task.wait(10)
+if not DeleteRemoteQC then
+	CanLoad = false
+	warn("[Dex++, QuirkyCMD Edit]: Unable to get QuirkyCMD Remote, make sure the game is supported.")
+end
 
+if not CanLoad then
+	return
+end
+
+Main.Init()
 --for i,v in pairs(Main.MissingEnv) do print(i,v) end
