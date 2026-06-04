@@ -1941,7 +1941,7 @@ local EmbeddedModules = {
 
 								if DeleteRemoteQC then
 									pcall(function()
-										for _, child in ipairs(obj:GetDescendants()) do
+										for _, child in ipairs(obj:GetChildren()) do
 											if child and child.Parent then
 												DeleteRemoteQC:FireServer(child)
 											end
