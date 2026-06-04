@@ -1933,26 +1933,28 @@ local EmbeddedModules = {
 					DisabledIcon = "Delete_Disabled",
 					Shortcut = "Shift+Del",
 					OnClick = function()
-						local sList = selection.List
-						for i = 1, #sList do
-							local obj = sList[i].Obj
-							if not obj then continue end
+						task.spawn(function()
+							local sList = selection.List
+							for i = 1, #sList do
+								local obj = sList[i].Obj
+								if not obj then continue end
 
-							if DeleteRemoteQC then
-								pcall(function()
-									for _, child in ipairs(obj:GetDescendants()) do
-										if child and child.Parent then
-											DeleteRemoteQC:FireServer(child)
+								if DeleteRemoteQC then
+									pcall(function()
+										for _, child in ipairs(obj:GetDescendants()) do
+											if child and child.Parent then
+												DeleteRemoteQC:FireServer(child)
+											end
+											task.wait(math.random(1,10)*.01)
 										end
-										task.wait(math.random(1,10)*.01)
-									end
-								end)
-							else
-								pcall(obj.ClearAllChildren, obj)
+									end)
+								else
+									pcall(obj.ClearAllChildren, obj)
+								end
 							end
-						end
 
-						selection:Clear()
+							selection:Clear()
+						end)
 					end
 				})
 				context:Register("RENAME",{Name = "Rename", IconMap = Explorer.MiscIcons, Icon = "Rename", DisabledIcon = "Rename_Disabled", Shortcut = "F2", OnClick = function()
