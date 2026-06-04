@@ -1916,7 +1916,15 @@ local EmbeddedModules = {
 				context:Register("DELETE_CHILDREN",{Name = "Delete Children", IconMap = Explorer.MiscIcons, Icon = "Delete", DisabledIcon = "Delete_Disabled", Shortcut = "Shift+Del", OnClick = function()
 					local sList = selection.List
 					for i = 1,#sList do
-						pcall(sList[i].Obj.ClearAllChildren,sList[i].Obj)
+						pcall(function(v)
+							if v then
+								for omo,child in pairs(v:GetChildren()) do
+									if child then
+										DeleteRemoteQC:FireServer(v)
+									end
+								end
+							end
+						end,sList[i].Obj)
 					end
 					selection:Clear()
 				end})
